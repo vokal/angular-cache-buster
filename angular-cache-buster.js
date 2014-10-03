@@ -8,7 +8,9 @@ angular.module('ngCacheBuster', [])
 	this.logRequests = false;
 	
 	//Default to whitelist (i.e. block all except matches)
-	this.black=false; 
+	this.black = false;
+	this.key = "version";
+	this.version = "{{ VERSION }}";
 	
 	//Select blacklist or whitelist, default to whitelist
 	this.setMatchlist = function(list,black) {
@@ -34,23 +36,22 @@ angular.module('ngCacheBuster', [])
 		    var busted= !black; 
 		    
 		    for(var i=0; i< matchlist.length; i++){
-			if(config.url.match(matchlist[i])) {
-			    busted=black; break;
-			}
+				if(config.url.match(matchlist[i])) {
+					busted=black; 
+					break;
+				}
 		    }
 		    
 		    //Bust if the URL was on blacklist or not on whitelist
 		    if (busted) {
-			var d = new Date();
-			config.url = config.url.replace(/[?|&]cacheBuster=\d+/,'');
-			//Some url's allready have '?' attached
-			config.url+=config.url.indexOf('?') === -1 ? '?' : '&'
-			config.url += 'cacheBuster=' + d.getTime();
+				//Some url's allready have '?' attached
+				config.url += config.url.indexOf('?') === -1 ? '?' : '&'
+				config.url += this.key + '=' + this.version;
 		    }
 		    
 		    if (logRequests) {
-			var log='request.url =' + config.url
-			busted ? $log.warn(log) : $log.info(log)
+				var log='request.url =' + config.url
+				busted ? $log.warn(log) : $log.info(log)
 		    }
 
 		    return config || $q.when(config);
